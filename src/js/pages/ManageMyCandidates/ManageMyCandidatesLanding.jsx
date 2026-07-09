@@ -6,11 +6,14 @@ import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import TagManager from 'react-gtm-module';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
+import AppObservableStore from '../../common/stores/AppObservableStore';
 import PoliticianStore from '../../common/stores/PoliticianStore';
 import { ImportInviteIcon } from '../../components/More/ImportInviteIcon';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import VoterStore from '../../stores/VoterStore';
+import CandidateStore from '../../stores/CandidateStore';
 import { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
+import { politicianRetrieveFromIdentifiersIfNeeded } from '../../common/utils/politicianUtils';
 
 const PoliticiansManagedController = React.lazy(() => import('../../components/PoliticiansManaged/PoliticiansManagedController'));
 const ImportAndInvitePage = React.lazy(() => import('../More/ManageMyCandidates'));
@@ -121,7 +124,19 @@ export default function ManageMyCandidatesLanding () {
   }, []);
 
   // Main render
-  const handleClaimEdit = () => history.push(`/candidate/${selectedPoliticianWeVoteId}/edit`);
+  const handleClaimEdit = () => {
+    console.log('handleClaimEdit - selectedPoliticianWeVoteId:', selectedPoliticianWeVoteId);
+    console.log('handleClaimEdit - selectedPolitician:', selectedPolitician);
+    if (!selectedPoliticianWeVoteId) {
+      alert('No candidate selected. Please select a candidate to edit their profile.');
+      return;
+    }
+    // Ensure politician data is loaded from backend before opening drawer
+    politicianRetrieveFromIdentifiersIfNeeded('', selectedPoliticianWeVoteId);
+    // Open PoliticianSelfEditDrawer with politicianWeVoteId
+    AppObservableStore.setPoliticianWeVoteIdBeingViewed(selectedPoliticianWeVoteId);
+    AppObservableStore.setDrawerOpen('politicianSelfEditDrawerOpen', true);
+  };
   const handleClaimImport = () => history.push('/managecandidates');
   const handleClaimTracking = () => history.push('/managecandidates/tracking');
   const handleClaimAnalytics = () => history.push('/managecandidates/analytics');

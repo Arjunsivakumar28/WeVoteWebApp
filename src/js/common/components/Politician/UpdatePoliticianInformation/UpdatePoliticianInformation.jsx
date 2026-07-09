@@ -64,6 +64,7 @@ function UpdatePoliticianInformation ({ politicianName, politicianWeVoteId }) {
 
   const handleOpenEditProfileDrawer = (buttonId) => {
     if (VoterStore.getVoterIsSignedIn()) {
+      console.log('edit politician:', politicianWeVoteId);
       AppObservableStore.setDrawerOpen('politicianSelfEditDrawerOpen', true);
       AppObservableStore.setPoliticianWeVoteIdBeingViewed(politicianWeVoteId);
       sendGTMDataLayer('openModal', buttonId, 'PoliticianSelfEditDrawer');
